@@ -12,16 +12,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
-// ve se tem como fazer tipo um login, (todas as acoes seram de uma conta especifica sem ter a necessidade de indentificar o numero da conta)
+//fazer login de contas
 // usar o jdbc quando o programa estiver pronto
 
 public class Program {
     public static List<Account> accounts = new ArrayList<>();
 
+   public static Account loggedInAccount;
+
     static Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
+
 //        accounts.add(new CheckingAccount("1010", String.valueOf(accounts.size()+1),100.0,new Client("reos","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21")),1000.0));
 //        accounts.add(new SavingsAccount("2020", String.valueOf(accounts.size()+1),100.0,new Client("fdsfsdf","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21"))));
+//
+//        loggedInAccount = accounts.getFirst();
         while (true){
             showMenu();
             System.out.print("Escolha uma opção: ");
@@ -58,6 +63,14 @@ public class Program {
     }
 
     private static void showMenu(){
+        System.out.println("Current Account:");
+        if (loggedInAccount != null){
+            System.out.println("Holder: "+ loggedInAccount.getClient().getName().toUpperCase());
+            System.out.println("Balance: R$ "+ String.format("%.2f",loggedInAccount.getBalance()));
+        }else {
+            System.out.println("Vc nao esta logado em nenhuma conta.");
+        }
+
         System.out.println("\n--- WELCOME ---");
         System.out.println("1. Create account");
         System.out.println("2. Deposit");
@@ -113,6 +126,9 @@ public class Program {
 
                 System.out.println("Success! Account created!");
                 System.out.println("Agency: " + account.getAgency() + ", Conta: " + account.getAccountNumber());
+
+                loggedInAccount = account;
+
                 break;
 
             case 2:
@@ -121,6 +137,9 @@ public class Program {
 
                 System.out.println("Success! Account created!");
                 System.out.println("Agency: " + account.getAgency() + ", Conta: " + account.getAccountNumber());
+
+                loggedInAccount = account;
+
                 break;
         }
     }
@@ -135,22 +154,19 @@ public class Program {
     }
 
     private static void depositAccount() {
+
         System.out.println("\n--- Depósito em Conta ---");
-        System.out.print("Digite o número da conta para depósito: ");
-        String accountNumber = sc.nextLine();
 
-        Account conta = searchForAccount(accountNumber);
-
-        if (conta != null) {
-            System.out.println(conta.getAgency());
-            System.out.println(conta.getClient().getName());
+        if (loggedInAccount != null) {
+            System.out.println(loggedInAccount.getAgency());
+            System.out.println(loggedInAccount.getClient().getName());
             System.out.print("Digite o valor a ser depositado: ");
             double value = sc.nextDouble();
 
-            conta.deposit(value);
+            loggedInAccount.deposit(value);
 
             System.out.println("Depósito realizado com sucesso!");
-            System.out.println("Novo saldo: R$ " + conta.getBalance());
+            System.out.println("Novo saldo: R$ " + String.format("%.2f",loggedInAccount.getBalance()));
         } else {
             System.out.println("Erro: Conta não encontrada.");
         }
@@ -158,21 +174,17 @@ public class Program {
 
     private static void withdraw(){
         System.out.println("\n--- Saque em Conta ---");
-        System.out.print("Digite o número da conta para saque: ");
-        String accountNumber = sc.nextLine();
 
-        Account conta = searchForAccount(accountNumber);
-
-        if (conta != null) {
-            System.out.println(conta.getAgency());
-            System.out.println(conta.getClient().getName());
+        if (loggedInAccount  != null) {
+            System.out.println(loggedInAccount.getAgency());
+            System.out.println(loggedInAccount.getClient().getName());
             System.out.print("Digite o valor a ser sacado: ");
             double value = sc.nextDouble();
 
-            conta.withdraw(value);
+            loggedInAccount.withdraw(value);
 
             System.out.println("Depósito realizado com sucesso!");
-            System.out.println("Novo saldo: R$ " + conta.getBalance());
+            System.out.println("Novo saldo: R$ " + String.format("%.2f",loggedInAccount.getBalance()));
         } else {
             System.out.println("Erro: Conta não encontrada.");
         }
@@ -180,26 +192,22 @@ public class Program {
 
     private static void transferToAccount(){
         System.out.println("\n--- Tranferencia entre Contas ---");
-        System.out.print("Digite o número da conta que o valor sera retirado: ");
-        String accountNumber = sc.nextLine();
-
-        Account contaRetirada = searchForAccount(accountNumber);
 
         System.out.print("Digite o número da conta que o valor sera destinado: ");
-        accountNumber = sc.nextLine();
+        String accountNumber = sc.nextLine();
         Account contaDestino = searchForAccount(accountNumber);
 
-        if (contaRetirada != null && contaDestino !=null) {
+        if (loggedInAccount != null && contaDestino !=null) {
             System.out.print("Digite o valor a ser transferido: ");
             double value = sc.nextDouble();
 
-            contaRetirada.transfer(value,contaDestino);
+            loggedInAccount.transfer(value,contaDestino);
 
             System.out.println("Transferencia realizada com sucesso!");
-            System.out.println("Novo saldo da conta de retirada: R$ " + contaRetirada.getBalance());
+            System.out.println("Novo saldo da conta de retirada: R$ " + String.format("%.2f",loggedInAccount.getBalance()));
             System.out.println("Novo saldo da conta de destino: R$ " + contaDestino.getBalance());
 
-        } else if (contaRetirada == null) {
+        } else if (loggedInAccount == null) {
             System.out.println("Erro: Conta para retirada não encontrada.");
         }else{
             System.out.println("Erro: Conta de destino para o valor não encontrada.");
@@ -208,14 +216,19 @@ public class Program {
 
     private static void transactionLogs(){
         System.out.println("\n--- Transacoes ---");
-        System.out.print("Digite o número da conta: ");
-        String accountNumber = sc.nextLine();
-
-        Account account = searchForAccount(accountNumber);
+//        System.out.print("Digite o número da conta: ");
+//        String accountNumber = sc.nextLine();
+//
+//        Account account = searchForAccount(accountNumber);
 
         System.out.println("\n---- TRANSACOES ---");
 
-        account.getTransactionList();
+        if (loggedInAccount !=null){
+            loggedInAccount.getTransactionList();
+        }else {
+            System.out.println("You need to log in to do this operation.");
+        }
+
 
     }
 
