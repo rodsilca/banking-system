@@ -32,8 +32,20 @@ public class SavingsAccount extends Account{
         if (value > getBalance()){
             System.out.println("Insufficient funds");
         }else {
-            destinyAccount.setBalance(getBalance() + value);
+            double transferFee = value * 0.02;
+            setBalance(getBalance() - (value + transferFee));
+
             addTransactionList(new Transaction(LocalDateTime.now(),value, TransactionType.TRANSFER_SENT));
+
+            destinyAccount.receiveTransfer(new Transaction(LocalDateTime.now(),value, TransactionType.TRANSFER_RECEIVED));
         }
+    }
+
+    @Override
+    public void receiveTransfer(Transaction transaction) {
+        double value = transaction.getValue();
+        setBalance(getBalance() + value);
+
+        addTransactionList(transaction);
     }
 }

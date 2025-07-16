@@ -7,13 +7,13 @@ import java.time.LocalDate;
 public class Client {
     private String name;
     private String cpf;
-    private ClientGender sex;
+    private ClientGender gender;
     private LocalDate birthDate;
 
-    public Client(String name, String cpf, ClientGender sex, LocalDate birthDate) {
+    public Client(String name, String cpf, ClientGender gender, LocalDate birthDate) {
         this.name = name;
         this.cpf = cpf;
-        this.sex = sex;
+        this.gender = gender;
         this.birthDate = birthDate;
     }
 
@@ -25,12 +25,12 @@ public class Client {
         this.name = name;
     }
 
-    public ClientGender getSex() {
-        return sex;
+    public ClientGender getGender() {
+        return gender;
     }
 
-    public void setSex(ClientGender sex) {
-        this.sex = sex;
+    public void setSex(ClientGender gender) {
+        this.gender = gender;
     }
 
     public String getCpf() {

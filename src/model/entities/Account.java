@@ -1,5 +1,6 @@
 package model.entities;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,16 +53,14 @@ public  abstract class Account {
     public void setClient(Client client) {
         this.client = client;
     }
-//refazer
-    public List<Transaction> getTransactionList() {
-        return transactionList;
+
+    public void getTransactionList() {
+        transactionList.forEach(System.out::println);
     }
 
     public void addTransactionList(Transaction transaction) {
         transactionList.add(transaction);
     }
-//fdfsdfsdfsdf
-
 
     @Override
     public String toString() {
@@ -71,5 +70,6 @@ public  abstract class Account {
     public abstract void deposit(double value);
     public abstract void withdraw(double value);
     public abstract void transfer(double value, Account destinyAccount);
+    public abstract void receiveTransfer(Transaction transaction);
 
 }
