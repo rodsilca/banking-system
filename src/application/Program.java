@@ -7,26 +7,22 @@ import model.entities.SavingsAccount;
 import model.enums.ClientGender;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
-//fazer login de contas
 // usar o jdbc quando o programa estiver pronto
 
 public class Program {
     public static List<Account> accounts = new ArrayList<>();
 
-   public static Account loggedInAccount;
+    public static Account loggedInAccount;
 
     static Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
 
-//        accounts.add(new CheckingAccount("1010", String.valueOf(accounts.size()+1),100.0,new Client("reos","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21")),1000.0));
-//        accounts.add(new SavingsAccount("2020", String.valueOf(accounts.size()+1),100.0,new Client("fdsfsdf","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21"))));
-//
-//        loggedInAccount = accounts.getFirst();
+        accounts.add(new CheckingAccount("1010", String.valueOf(accounts.size()+1),100.0,new Client("reos","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21")),1000.0));
+        accounts.add(new SavingsAccount("2020", String.valueOf(accounts.size()+1),100.0,new Client("fdsfsdf","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21"))));
+
+        loggedInAccount = accounts.getFirst();
         while (true){
             showMenu();
             System.out.print("Escolha uma opção: ");
@@ -52,6 +48,9 @@ public class Program {
                 case 6:
                     transactionLogs();
                     break;
+                case 7:
+                    switchAccounts();
+                    break;
                 case 0:
                     System.out.println("Bye!! See you soon");
                     sc.close();
@@ -63,8 +62,9 @@ public class Program {
     }
 
     private static void showMenu(){
-        System.out.println("Current Account:");
+        System.out.println("\nCurrent Account:");
         if (loggedInAccount != null){
+            System.out.println("Account Number: " + loggedInAccount.getAccountNumber());
             System.out.println("Holder: "+ loggedInAccount.getClient().getName().toUpperCase());
             System.out.println("Balance: R$ "+ String.format("%.2f",loggedInAccount.getBalance()));
         }else {
@@ -78,6 +78,7 @@ public class Program {
         System.out.println("4. Transfer");
         System.out.println("5. List all accounts");
         System.out.println("6. Transaction logs");
+        System.out.println("7. Switch accounts");
         System.out.println("0. Leave");
         System.out.println("---------------------------------");
     }
@@ -239,5 +240,27 @@ public class Program {
         } else {
             accounts.forEach(System.out::println);
         }
+    }
+
+    private static void switchAccounts(){
+        System.out.println("\n--- SWITCHING ACCOUNTS ---");
+        System.out.println("Type the number of the account you wish to switch to: ");
+        String accountNumber = sc.nextLine();
+
+        Account accountToLogIn = searchForAccount(accountNumber);
+
+
+        if (accountToLogIn!=null && Objects.equals(accountToLogIn.getAccountNumber(), loggedInAccount.getAccountNumber())){
+            System.out.println("Already logged into this account");
+
+        } else if (accountToLogIn !=null){
+
+            System.out.println("Login Successful !");
+            loggedInAccount = accountToLogIn;
+
+        } else {
+            System.out.println("\nAccount not found.");
+        }
+
     }
 }
