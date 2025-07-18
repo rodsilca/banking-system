@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 
 public class SavingsAccount extends Account{
 
-    public SavingsAccount(String agency, String accountNumber, Double balance, Client client) {
-        super(agency, accountNumber, balance, client);
+    public SavingsAccount(String agency, String accountNumber,String password, Client client) {
+        super(agency, accountNumber, password, client);
     }
 
     @Override

@@ -8,6 +8,7 @@ public  abstract class Account {
     private String agency;
     private String accountNumber;
     private Double balance;
+    private String password;
 
     private Client client;
     private List<Transaction> transactionList = new ArrayList<>();
@@ -15,10 +16,11 @@ public  abstract class Account {
     public Account() {
     }
 
-    public Account(String agency, String accountNumber, Double balance, Client client) {
+    public Account(String agency, String accountNumber,String password, Client client) {
         this.agency = agency;
         this.accountNumber = accountNumber;
-        this.balance = balance;
+        this.balance = 0.0;
+        this.password = password;
         this.client = client;
     }
 
@@ -52,6 +54,14 @@ public  abstract class Account {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void getTransactionList() {

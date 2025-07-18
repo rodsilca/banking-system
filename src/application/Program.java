@@ -19,8 +19,8 @@ public class Program {
     static Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
 
-        accounts.add(new CheckingAccount("1010", String.valueOf(accounts.size()+1),100.0,new Client("reos","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21")),1000.0));
-        accounts.add(new SavingsAccount("2020", String.valueOf(accounts.size()+1),100.0,new Client("fdsfsdf","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21"))));
+        accounts.add(new CheckingAccount("1010", String.valueOf(accounts.size()+1),"1234",new Client("reos","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21")),1000.0));
+        accounts.add(new SavingsAccount("2020", String.valueOf(accounts.size()+1),"1234",new Client("fdsfsdf","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21"))));
 
         loggedInAccount = accounts.getFirst();
         while (true){
@@ -91,7 +91,7 @@ public class Program {
         System.out.println("2 - Savings account");
         int option = sc.nextInt();
 
-        System.out.println("Name:");
+        System.out.println("Holder name:");
         String name = sc.next();
 
         System.out.println("CPF:");
@@ -118,11 +118,15 @@ public class Program {
 
         Client client = new Client(name, cpf, gender, dateBirth);
 
+        System.out.println("Enter a password: ");
+        String password = sc.nextLine();
+
+
         Account account;
 
         switch (option) {
             case 1:
-                account = new CheckingAccount("1010", String.valueOf(accounts.size()+1),0.0,client,1000.0);
+                account = new CheckingAccount("1010", String.valueOf(accounts.size()+1),password,client,1000.0);
                 accounts.add(account);
 
                 System.out.println("Success! Account created!");
@@ -133,7 +137,7 @@ public class Program {
                 break;
 
             case 2:
-                account = new SavingsAccount("2020", String.valueOf(accounts.size()+1),0.0,client);
+                account = new SavingsAccount("2020", String.valueOf(accounts.size()+1),password,client);
                 accounts.add(account);
 
                 System.out.println("Success! Account created!");
@@ -250,17 +254,29 @@ public class Program {
         Account accountToLogIn = searchForAccount(accountNumber);
 
 
-        if (accountToLogIn!=null && Objects.equals(accountToLogIn.getAccountNumber(), loggedInAccount.getAccountNumber())){
+
+        if(accountToLogIn == null) {
+            System.out.println("\nAccount not found.");
+
+        } else if (Objects.equals(accountToLogIn.getAccountNumber(), loggedInAccount.getAccountNumber())){
             System.out.println("Already logged into this account");
 
-        } else if (accountToLogIn !=null){
+        }else{
+            System.out.println("\nAccount Number: " +accountToLogIn.getAccountNumber());
+            System.out.println("Account Holder: " +accountToLogIn.getClient().getName());
+            System.out.println("\nEnter the password: ");
+            String password = sc.nextLine();
 
-            System.out.println("Login Successful !");
-            loggedInAccount = accountToLogIn;
+            if (accountToLogIn.getPassword().equals(password)){
+                System.out.println("Login Successful!");
 
-        } else {
-            System.out.println("\nAccount not found.");
+                loggedInAccount = accountToLogIn;
+            }else {
+                System.out.println("Wrong password try again.");
+            }
+
         }
+
 
     }
 }

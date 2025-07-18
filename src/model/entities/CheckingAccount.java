@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 public class CheckingAccount extends Account{
     private Double lineOfCredit;
 
-    public CheckingAccount(String agency, String accountNumber, Double balance, Client client, Double lineOfCredit) {
-        super(agency, accountNumber, balance, client);
+    public CheckingAccount(String agency, String accountNumber,String password, Client client, Double lineOfCredit) {
+        super(agency, accountNumber,password,client);
         this.lineOfCredit = lineOfCredit;
     }
 
