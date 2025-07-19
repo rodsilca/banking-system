@@ -1,9 +1,5 @@
 package model.entities;
 
-import model.enums.TransactionType;
-
-import java.time.LocalDateTime;
-
 public class CheckingAccount extends Account{
     private Double lineOfCredit;
 
@@ -23,7 +19,7 @@ public class CheckingAccount extends Account{
     @Override
     public void deposit(double value) {
         setBalance(getBalance() + value);
-        addTransactionList(new Transaction(LocalDateTime.now(),value, TransactionType.DEPOSIT));
+
     }
 
     @Override
@@ -32,7 +28,7 @@ public class CheckingAccount extends Account{
             System.out.println("Insufficient Funds");
         }else {
             setBalance(getBalance() - value);
-            addTransactionList(new Transaction(LocalDateTime.now(),value, TransactionType.WITHDRAW));
+
         }
 
     }
@@ -45,9 +41,7 @@ public class CheckingAccount extends Account{
             double transferFee = value * 0.02;
             setBalance(getBalance() - (value + transferFee));
 
-            addTransactionList(new Transaction(LocalDateTime.now(),value, TransactionType.TRANSFER_SENT));
 
-            destinyAccount.receiveTransfer(new Transaction(LocalDateTime.now(),value, TransactionType.TRANSFER_RECEIVED));
         }
     }
 

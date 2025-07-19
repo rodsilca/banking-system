@@ -1,10 +1,10 @@
 package application;
 
-import model.entities.Account;
-import model.entities.CheckingAccount;
-import model.entities.Client;
-import model.entities.SavingsAccount;
+import model.entities.*;
 import model.enums.ClientGender;
+import repository.AccountRepository;
+import repository.TransactionRepository;
+import service.AccountService;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -13,16 +13,22 @@ import java.util.*;
 
 public class Program {
     public static List<Account> accounts = new ArrayList<>();
-
+    private static AccountService accountService;
     public static Account loggedInAccount;
 
     static Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
+        AccountRepository  accountRepository = new AccountRepository();
+        TransactionRepository transactionRepository = new TransactionRepository();
 
-        accounts.add(new CheckingAccount("1010", String.valueOf(accounts.size()+1),"1234",new Client("reos","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21")),1000.0));
-        accounts.add(new SavingsAccount("2020", String.valueOf(accounts.size()+1),"1234",new Client("fdsfsdf","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21"))));
+        accountService = new AccountService(transactionRepository,accountRepository);
 
-        loggedInAccount = accounts.getFirst();
+        Account checking = new CheckingAccount("1010", "1","1234",new Client("reos","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21")),1000.0);
+        Account savings = new SavingsAccount("2020", "2","1234",new Client("fdsfsdf","323232332",ClientGender.MASCULINE,LocalDate.parse("2020-02-21")));
+        accountRepository.save(checking);
+        accountRepository.save(savings);
+
+        loggedInAccount = accountRepository.findByNumber("1");
         while (true){
             showMenu();
             System.out.print("Escolha uma opção: ");
@@ -43,12 +49,9 @@ public class Program {
                     transferToAccount();
                     break;
                 case 5:
-                    listAccounts();
-                    break;
-                case 6:
                     transactionLogs();
                     break;
-                case 7:
+                case 6:
                     switchAccounts();
                     break;
                 case 0:
@@ -76,9 +79,8 @@ public class Program {
         System.out.println("2. Deposit");
         System.out.println("3. Withdraw");
         System.out.println("4. Transfer");
-        System.out.println("5. List all accounts");
-        System.out.println("6. Transaction logs");
-        System.out.println("7. Switch accounts");
+        System.out.println("5. Transaction logs");
+        System.out.println("6. Switch accounts");
         System.out.println("0. Leave");
         System.out.println("---------------------------------");
     }
@@ -121,42 +123,21 @@ public class Program {
         System.out.println("Enter a password: ");
         String password = sc.nextLine();
 
+        loggedInAccount = accountService.createAccount(option,password,client);
+        accounts.add(loggedInAccount);
 
-        Account account;
+        System.out.println("Account created successfully !");
 
-        switch (option) {
-            case 1:
-                account = new CheckingAccount("1010", String.valueOf(accounts.size()+1),password,client,1000.0);
-                accounts.add(account);
-
-                System.out.println("Success! Account created!");
-                System.out.println("Agency: " + account.getAgency() + ", Conta: " + account.getAccountNumber());
-
-                loggedInAccount = account;
-
-                break;
-
-            case 2:
-                account = new SavingsAccount("2020", String.valueOf(accounts.size()+1),password,client);
-                accounts.add(account);
-
-                System.out.println("Success! Account created!");
-                System.out.println("Agency: " + account.getAgency() + ", Conta: " + account.getAccountNumber());
-
-                loggedInAccount = account;
-
-                break;
-        }
     }
 
-    private static Account searchForAccount(String numero) {
-        // Usando a Stream API para encontrar a conta de forma eficiente
-        Optional<Account> foundAccount = accounts.stream()
-                .filter(account -> account.getAccountNumber().equals(numero))
-                .findFirst();
-
-        return foundAccount.orElse(null); // Retorna a conta se encontrou, ou null se não encontrou.
-    }
+//    private static Account searchForAccount(String numero) {
+//        // Usando a Stream API para encontrar a conta de forma eficiente
+//        Optional<Account> foundAccount = accounts.stream()
+//                .filter(account -> account.getAccountNumber().equals(numero))
+//                .findFirst();
+//
+//        return foundAccount.orElse(null); // Retorna a conta se encontrou, ou null se não encontrou.
+//    }
 
     private static void depositAccount() {
 
@@ -168,7 +149,7 @@ public class Program {
             System.out.print("Digite o valor a ser depositado: ");
             double value = sc.nextDouble();
 
-            loggedInAccount.deposit(value);
+            accountService.deposit(loggedInAccount.getAccountNumber(), value);
 
             System.out.println("Depósito realizado com sucesso!");
             System.out.println("Novo saldo: R$ " + String.format("%.2f",loggedInAccount.getBalance()));
@@ -186,7 +167,7 @@ public class Program {
             System.out.print("Digite o valor a ser sacado: ");
             double value = sc.nextDouble();
 
-            loggedInAccount.withdraw(value);
+            accountService.withdraw(loggedInAccount.getAccountNumber(), value);
 
             System.out.println("Depósito realizado com sucesso!");
             System.out.println("Novo saldo: R$ " + String.format("%.2f",loggedInAccount.getBalance()));
@@ -200,36 +181,25 @@ public class Program {
 
         System.out.print("Digite o número da conta que o valor sera destinado: ");
         String accountNumber = sc.nextLine();
-        Account contaDestino = searchForAccount(accountNumber);
 
-        if (loggedInAccount != null && contaDestino !=null) {
+        if (loggedInAccount != null) {
             System.out.print("Digite o valor a ser transferido: ");
             double value = sc.nextDouble();
 
-            loggedInAccount.transfer(value,contaDestino);
+            accountService.transfer(loggedInAccount.getAccountNumber(), accountNumber,value);
 
             System.out.println("Transferencia realizada com sucesso!");
             System.out.println("Novo saldo da conta de retirada: R$ " + String.format("%.2f",loggedInAccount.getBalance()));
-            System.out.println("Novo saldo da conta de destino: R$ " + contaDestino.getBalance());
-
-        } else if (loggedInAccount == null) {
+        } else {
             System.out.println("Erro: Conta para retirada não encontrada.");
-        }else{
-            System.out.println("Erro: Conta de destino para o valor não encontrada.");
         }
     }
 
     private static void transactionLogs(){
-        System.out.println("\n--- Transacoes ---");
-//        System.out.print("Digite o número da conta: ");
-//        String accountNumber = sc.nextLine();
-//
-//        Account account = searchForAccount(accountNumber);
-
-        System.out.println("\n---- TRANSACOES ---");
+        System.out.println("\n---- TRANSACTIONS FOR THIS ACCOUNT ---");
 
         if (loggedInAccount !=null){
-            loggedInAccount.getTransactionList();
+            accountService.transactionLogs(loggedInAccount.getAccountNumber()).forEach(System.out::println);
         }else {
             System.out.println("You need to log in to do this operation.");
         }
@@ -237,23 +207,12 @@ public class Program {
 
     }
 
-    private static void listAccounts() {
-        System.out.println("\n--- Lista de Contas Cadastradas ---");
-        if (accounts.isEmpty()) {
-            System.out.println("Nenhuma conta cadastrada no momento.");
-        } else {
-            accounts.forEach(System.out::println);
-        }
-    }
-
     private static void switchAccounts(){
         System.out.println("\n--- SWITCHING ACCOUNTS ---");
         System.out.println("Type the number of the account you wish to switch to: ");
         String accountNumber = sc.nextLine();
 
-        Account accountToLogIn = searchForAccount(accountNumber);
-
-
+        Account accountToLogIn = accountService.findAccount(accountNumber);
 
         if(accountToLogIn == null) {
             System.out.println("\nAccount not found.");
@@ -276,7 +235,5 @@ public class Program {
             }
 
         }
-
-
     }
 }

@@ -8,11 +8,13 @@ public class Transaction {
     private LocalDateTime date;
     private double value;
     private TransactionType transactionType;
+    private Account account;
 
-    public Transaction(LocalDateTime date, double value, TransactionType transactionType) {
+    public Transaction(LocalDateTime date, double value, TransactionType transactionType,Account account) {
         this.date = date;
         this.value = value;
         this.transactionType = transactionType;
+        this.account = account;
     }
 
     public LocalDateTime getDate() {
@@ -37,6 +39,14 @@ public class Transaction {
 
     public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
     @Override
