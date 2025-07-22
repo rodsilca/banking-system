@@ -124,7 +124,6 @@ public class Program {
         String password = sc.nextLine();
 
         loggedInAccount = accountService.createAccount(option,password,client);
-        accounts.add(loggedInAccount);
 
         System.out.println("Account created successfully !");
 

@@ -1,10 +1,12 @@
 package model.entities;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public  abstract class Account {
+public  abstract class Account  implements Serializable {
     private String agency;
     private String accountNumber;
     private Double balance;
@@ -70,6 +72,18 @@ public  abstract class Account {
 
     public void addTransactionList(Transaction transaction) {
         transactionList.add(transaction);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return Objects.equals(accountNumber, account.accountNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(accountNumber);
     }
 
     @Override
